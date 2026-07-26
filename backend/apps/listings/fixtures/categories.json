@@ -1,0 +1,12 @@
+[
+  {"model": "listings.category", "pk": 1, "fields": {"name": "Tools & Equipment", "slug": "tools-equipment", "is_other": false}},
+  {"model": "listings.category", "pk": 2, "fields": {"name": "Cameras & Photography", "slug": "cameras-photography", "is_other": false}},
+  {"model": "listings.category", "pk": 3, "fields": {"name": "Camping & Outdoor", "slug": "camping-outdoor", "is_other": false}},
+  {"model": "listings.category", "pk": 4, "fields": {"name": "Party & Events", "slug": "party-events", "is_other": false}},
+  {"model": "listings.category", "pk": 5, "fields": {"name": "Electronics & Gadgets", "slug": "electronics-gadgets", "is_other": false}},
+  {"model": "listings.category", "pk": 6, "fields": {"name": "Sports & Fitness", "slug": "sports-fitness", "is_other": false}},
+  {"model": "listings.category", "pk": 7, "fields": {"name": "Furniture & Home", "slug": "furniture-home", "is_other": false}},
+  {"model": "listings.category", "pk": 8, "fields": {"name": "Vehicles & Transport", "slug": "vehicles-transport", "is_other": false}},
+  {"model": "listings.category", "pk": 9, "fields": {"name": "Musical Instruments", "slug": "musical-instruments", "is_other": false}},
+  {"model": "listings.category", "pk": 10, "fields": {"name": "Other", "slug": "other", "is_other": true}}
+]
