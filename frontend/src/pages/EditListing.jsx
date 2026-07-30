@@ -17,7 +17,9 @@ export default function EditListing() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    api.categories().then(setCategories).catch(() => setCategories([]));
+    api.categories()
+    .then((data) => setCategories(data.results ?? data))
+    .catch(() => setCategories([]));
     api.listing(id).then((listing) => {
       setForm({
         title: listing.title,

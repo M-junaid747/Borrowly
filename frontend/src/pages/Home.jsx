@@ -20,7 +20,9 @@ export default function Home() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api.categories().then(setCategories).catch(() => setCategories([]));
+    api.categories()
+    .then((data) => setCategories(data.results ?? data))
+    .catch(() => setCategories([]));
   }, []);
 
   // Support deep links like /?category=tools-equipment from the footer,

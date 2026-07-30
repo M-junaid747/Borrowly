@@ -41,15 +41,12 @@ async function refreshAccessToken() {
  * - On a 401, tries one silent token refresh, then retries once.
  */
 export async function apiRequest(path, { method = "GET", body, formData, auth = true } = {}) {
-  const headers = {};
-  if (!formData) headers["Content-Type"] = "application/json";
-
-  const { access } = getTokens();
-  if (auth && access) headers["Authorization"] = `Bearer ${access}`;
+  const baseHeaders = {};
+  if (!formData) baseHeaders["Content-Type"] = "application/json";
 
   const doFetch = async (token) => {
-    const finalHeaders = { ...headers };
-    if (token) finalHeaders["Authorization"] = `Bearer ${token}`;
+    const finalHeaders = { ...baseHeaders };
+    if (auth && token) finalHeaders["Authorization"] = `Bearer ${token}`;
     return fetch(`${API_BASE_URL}${path}`, {
       method,
       headers: finalHeaders,
@@ -57,12 +54,20 @@ export async function apiRequest(path, { method = "GET", body, formData, auth = 
     });
   };
 
-  let response = await doFetch(access);
+  const { access } = getTokens();
+  let response = await doFetch(auth ? access : null);
 
-  if (response.status === 401 && auth) {
+  if (response.status === 401 && auth && access) {
     const newAccess = await refreshAccessToken();
     if (newAccess) {
       response = await doFetch(newAccess);
+    } else {
+      // Refresh failed too - the stored token is unusable. Clear it and
+      // retry once with no Authorization header at all, so public/
+      // read-only endpoints still succeed instead of failing forever
+      // because of a token nobody asked to send.
+      clearTokens();
+      response = await doFetch(null);
     }
   }
 
