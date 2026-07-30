@@ -31,9 +31,16 @@ class CategoryListView(generics.ListAPIView):
 
 class ListingListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ["category"]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ["category", "price_unit"]
     search_fields = ["title", "description"]
+    # No default `ordering` here on purpose: when a lat/lng search is active,
+    # get_queryset() already orders by distance - a view-level default would
+    # silently override that every time the client didn't also pass
+    # ?ordering=. Without one, OrderingFilter only acts when the client
+    # explicitly asks for it, otherwise it leaves get_queryset()'s ordering
+    # (distance, or the model's default -created_at) untouched.
+    ordering_fields = ["price_amount", "created_at"]
 
     def get_serializer_class(self):
         return ListingDetailSerializer if self.request.method == "POST" else ListingListSerializer
@@ -102,6 +109,17 @@ class ListingImageUploadView(APIView):
         image = ListingImage.objects.create(listing=listing, image=image_file)
         return Response(ListingImageSerializer(image, context={"request": request}).data, status=status.HTTP_201_CREATED)
 
+class ListingImageDeleteView(APIView):
+    """Lets an owner remove a single photo while editing a listing."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, listing_id, image_id):
+        image = generics.get_object_or_404(ListingImage, id=image_id, listing_id=listing_id)
+        if image.listing.owner_id != request.user.id:
+            return Response({"detail": "Not your listing."}, status=status.HTTP_403_FORBIDDEN)
+        image.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class AvailabilityCreateView(generics.CreateAPIView):
     serializer_class = AvailabilitySerializer

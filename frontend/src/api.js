@@ -98,6 +98,8 @@ export const api = {
   myListings: () => apiRequest("/listings/mine/"),
   listing: (id) => apiRequest(`/listings/${id}/`),
   createListing: (payload) => apiRequest("/listings/", { method: "POST", body: payload }),
+  updateListing: (id, payload) => apiRequest(`/listings/${id}/`, { method: "PATCH", body: payload }),
+  deleteListing: (id) => apiRequest(`/listings/${id}/`, { method: "DELETE" }),
   uploadListingImage: (listingId, file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -111,6 +113,7 @@ export const api = {
     }
     return results;
   },
+  deleteListingImage: (listingId, imageId) => apiRequest(`/listings/${listingId}/images/${imageId}/`, { method: "DELETE" }),
 
   bookings: () => apiRequest("/bookings/"),
   createBooking: (payload) => apiRequest("/bookings/", { method: "POST", body: payload }),

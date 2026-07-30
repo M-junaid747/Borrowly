@@ -1,9 +1,11 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 
+import Footer from "./components/Footer.jsx";
 import NavBar from "./components/NavBar.jsx";
 import CreateListing from "./pages/CreateListing.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import EditListing from "./pages/EditListing.jsx";
 import Home from "./pages/Home.jsx";
 import ListingDetail from "./pages/ListingDetail.jsx";
 import Login from "./pages/Login.jsx";
@@ -11,16 +13,20 @@ import Register from "./pages/Register.jsx";
 
 export default function App() {
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <NavBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/listings/new" element={<CreateListing />} />
-        <Route path="/listings/:id" element={<ListingDetail />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </>
+      <div style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/listings/new" element={<CreateListing />} />
+          <Route path="/listings/:id" element={<ListingDetail />} />
+          <Route path="/listings/:id/edit" element={<EditListing />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </div>
+      <Footer />
+    </div>
   );
 }

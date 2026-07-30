@@ -99,6 +99,16 @@ function SellerDashboard() {
     }
   };
 
+  const removeListing = async (listingId) => {
+    if (!window.confirm("Delete this listing permanently? This can't be undone.")) return;
+    try {
+      await api.deleteListing(listingId);
+      load();
+    } catch {
+      setError("Could not delete that listing.");
+    }
+  };
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -111,10 +121,20 @@ function SellerDashboard() {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16, marginBottom: 32 }}>
           {listings.map((l) => (
-            <Link key={l.id} to={`/listings/${l.id}`} className="card card-hover" style={{ padding: 14, textDecoration: "none", color: "inherit" }}>
-              <strong style={{ fontSize: "0.95rem" }}>{l.title}</strong>
-              <p style={{ margin: "4px 0 0", color: "var(--brand-start)", fontWeight: 700 }}>${l.price_amount}/{l.price_unit}</p>
-            </Link>
+            <div key={l.id} className="card" style={{ padding: 14 }}>
+              <Link to={`/listings/${l.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <strong style={{ fontSize: "0.95rem" }}>{l.title}</strong>
+                <p style={{ margin: "4px 0 10px", color: "var(--brand-start)", fontWeight: 700 }}>${l.price_amount}/{l.price_unit}</p>
+              </Link>
+              <div style={{ display: "flex", gap: 6 }}>
+                <Link to={`/listings/${l.id}/edit`} className="btn btn-secondary btn-sm" style={{ textDecoration: "none", flex: 1, textAlign: "center" }}>
+                  Edit
+                </Link>
+                <button className="btn btn-danger btn-sm" style={{ flex: 1 }} onClick={() => removeListing(l.id)}>
+                  Delete
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       )}

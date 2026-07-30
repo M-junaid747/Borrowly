@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { api } from "../api.js";
 import ChatThread from "../components/ChatThread.jsx";
@@ -18,6 +18,7 @@ function mapsLinkFor(listing) {
 export default function ListingDetail() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { user, switchRole } = useAuth();
   const [listing, setListing] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
@@ -25,6 +26,7 @@ export default function ListingDetail() {
   const [endDatetime, setEndDatetime] = useState("");
   const [bookingMessage, setBookingMessage] = useState("");
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     api.listing(id).then(setListing).catch(() => setError("Listing not found."));
@@ -63,6 +65,18 @@ export default function ListingDetail() {
       setBookingMessage("Booking requested! The owner will confirm it, then you can pay from your dashboard.");
     } catch (err) {
       setError("Could not create booking. Check your dates/times.");
+    }
+  };
+
+  const deleteThisListing = async () => {
+    if (!window.confirm("Delete this listing permanently? This can't be undone.")) return;
+    setDeleting(true);
+    try {
+      await api.deleteListing(listing.id);
+      navigate("/dashboard");
+    } catch {
+      setError("Could not delete this listing.");
+      setDeleting(false);
     }
   };
 
@@ -127,7 +141,16 @@ export default function ListingDetail() {
       <div>
         {isOwnListing ? (
           <div className="card" style={{ padding: 20 }}>
-            <p>This is your listing. Reply to renters from your Dashboard inbox, or manage it there.</p>
+            <p style={{ marginBottom: 16 }}>This is your listing. Reply to renters from your Dashboard inbox, or manage it here.</p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <Link to={`/listings/${listing.id}/edit`} className="btn btn-secondary" style={{ textDecoration: "none", flex: 1, textAlign: "center" }}>
+                Edit listing
+              </Link>
+              <button className="btn btn-danger" onClick={deleteThisListing} disabled={deleting} style={{ flex: 1 }}>
+                {deleting ? "Deleting…" : "Delete listing"}
+              </button>
+            </div>
+            {error && <p className="error-text">{error}</p>}
           </div>
         ) : !user ? (
           <div className="card" style={{ padding: 20 }}>
